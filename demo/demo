@@ -1,0 +1,32 @@
+#!/bin/bash
+
+xrdb - <<< urxvt.transparent:false
+
+find .. -maxdepth 1 -type f ! -name README.md ! -name .Xdefaults | while read -r scheme; do
+  schemename=$(cut -d/ -f2 <<< "$scheme")
+  xrdb -override "$scheme"
+  urxvt -e bash -c '
+    echo $1
+    for i in $(seq -s\  16); do
+      tput setaf $i
+      echo -n "COLOR $i  "
+    done;
+
+    echo
+    tput rev
+
+    for i in $(seq -s\  16); do
+      tput setaf $i
+      echo -n "COLOR $i  "
+    done
+
+    echo
+    sleep 0.1
+
+    scrot --focused "$1.png"
+    xrdb -remove
+  ' 0 "$schemename"
+done
+
+xrdb -remove
+feh --thumbnails --thumb-width=256 .
